@@ -17,24 +17,26 @@ define wireguard::tunnel (
 ) {
 
   include wireguard::packages
-
-  $detail_peers = $peers.map |$peer| {
+  $peers.each |$peer| {
     if($peer['public_key'] == undef) {
       fail('public key is mandatory for each peer')
     }
-    return {
-      public_key => $peer['public_key'],
-      allowed_ips => $peer['allowed_ips'] or '0.0.0.0/0, ::/0',
-      endpoint => $peer['endpoint'],
-    }
+    $allowed_ips = $peer['allowed_ips']
   }
+
 
   file { "/etc/wireguard/${title}.conf":
     ensure  => file,
     content => epp('wireguard/config.epp', {
       private_key => $private_key,
       listen_port => $listen_port,
-      peers       => $detail_peers,
+      peers       => $peers.map |$peer| {
+        {
+          'public_key'  => $peer['public_key'],
+          'endpoint'  => $peer['endpoint'],
+          'allowed_ips' => ($peer['allowed_ips'] != undef) ? { true => $peer['allowed_ips'], default => '0.0.0.0/0, ::/0'},
+        }
+      },
     }),
     notify  => Exec["wireguard@${title}_reload"],
   }
