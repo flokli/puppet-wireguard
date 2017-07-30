@@ -17,8 +17,8 @@ define wireguard::simple_tunnel (
   String  $private_key,
   Integer $listen_port,
   String $peer_public_key,
-  String $peer_allowed_ips,
-  String $peer_endpoint,
+  Optional[String] $peer_allowed_ips = undef,
+  Optional[String] $peer_endpoint = undef,
 ) {
 
   wireguard::tunnel { $title:
