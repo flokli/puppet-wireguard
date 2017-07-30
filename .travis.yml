@@ -1,0 +1,15 @@
+language: ruby
+cache: bundler
+sudo: false
+rvm:
+  - 2.1
+  - 2.2
+  - 2.3
+install:
+  - bundle install
+env:
+  - RAKE_TASK=lint
+  - RAKE_TASK=syntax
+
+script:
+  - "bundle exec rake $RAKE_TASK"

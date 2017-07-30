@@ -1,0 +1,17 @@
+<%- | String $private_key,
+      Integer $listen_port,
+      Array[Hash] $peers = []
+| -%>
+
+[Interface]
+PrivateKey = <%= $private_key %>
+ListenPort = <%= $listen_port %>
+
+<% $peers.each |$peer| { -%>
+[Peer]
+PublicKey  = <%= $peer['public_key'] %>
+AllowedIPs = <%= $peer['allowed_ips'] %>
+<% if $peer['endpoint'] { -%>
+Endpoint   = <%= $peer['endpoint'] %>
+<% } -%>
+<% } %>

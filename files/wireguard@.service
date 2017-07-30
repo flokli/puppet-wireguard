@@ -1,0 +1,20 @@
+[Unit]
+Description=WireGuard via wg(8) for %I
+After=network-online.target
+Wants=network-online.target
+ConditionFileNotEmpty=/etc/wireguard/%i.conf
+Documentation=man:wg(8)
+Documentation=https://www.wireguard.io/
+Documentation=https://www.wireguard.io/quickstart/
+Documentation=https://git.zx2c4.com/WireGuard/about/src/tools/wg.8
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/sbin/ip link add dev %i type wireguard
+ExecStart=/usr/bin/wg setconf %i /etc/wireguard/%i.conf
+ExecStop=/sbin/ip link del %i
+ExecReload=/usr/bin/wg setconf %i /etc/wireguard/%i.conf
+
+[Install]
+WantedBy=multi-user.target

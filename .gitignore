@@ -1,0 +1,4 @@
+/modules
+/.bundle
+/vendor
+/Gemfile.lock

@@ -1,0 +1,16 @@
+image: ruby:2.3
+
+before_script:
+  - bundle install
+
+stages:
+  - check
+
+lint:
+  stage: check
+  script:
+    - bundle exec rake lint
+syntax:
+  stage: check
+  script:
+    - bundle exec rake syntax
