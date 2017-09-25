@@ -19,6 +19,8 @@ define wireguard::tunnel (
       public_key           => String,
       endpoint             => Optional[String],
       allowed_ips          => Optional[String],
+      preshared_key        => Optional[String],
+      persistent_keepalive => Optional[Integer[0-65535]],
     }
   ]] $peers = {},
 ) {
@@ -41,6 +43,8 @@ define wireguard::tunnel (
           'public_key'           => $value['public_key'],
           'endpoint'             => $value['endpoint'],
           'allowed_ips'          => ($value['allowed_ips'] != undef) ? { true => $value['allowed_ips'], default => '0.0.0.0/0, ::/0'},
+          'preshared_key'        => $value['preshared_key'],
+          'persistent_keepalive' => $value['persistent_keepalive'],
         }
       },
     }),
