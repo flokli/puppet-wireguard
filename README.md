@@ -5,5 +5,5 @@ This module manages wireguard tunnels
 
 ## Supported distributions
  - Debian (Jessie and later)
- - Ubuntu (Yakkety and later)
+ - Ubuntu (Trusty, Xenial and later)
  - Archlinux
