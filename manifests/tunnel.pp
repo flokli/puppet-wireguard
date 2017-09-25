@@ -13,43 +13,47 @@
 define wireguard::tunnel (
   String  $private_key,
   Integer $listen_port,
-  Array[Hash] $peers,
+  Enum['present','absent'] $ensure = 'present',
+  Hash[String, Struct[
+    {
+      public_key           => String,
+      endpoint             => Optional[String],
+      allowed_ips          => Optional[String],
+      preshared_key        => Optional[String],
+      persistent_keepalive => Optional[Integer[0-65535]],
+    }
+  ]] $peers = {},
 ) {
 
   include wireguard::packages
-  $peers.each |$peer| {
-    if($peer['public_key'] == undef) {
+
+  $peers.each |$key, $value| {
+    if($value['public_key'] == undef) {
       fail('public key is mandatory for each peer')
     }
-    $allowed_ips = $peer['allowed_ips']
   }
 
-
   file { "/etc/wireguard/${title}.conf":
-    ensure  => file,
+    ensure  => $ensure,
     content => epp('wireguard/config.epp', {
       private_key => $private_key,
       listen_port => $listen_port,
-      peers       => $peers.map |$peer| {
+      peers       => $peers.map |$key, $value| {
         {
-          'public_key'  => $peer['public_key'],
-          'endpoint'  => $peer['endpoint'],
-          'allowed_ips' => ($peer['allowed_ips'] != undef) ? { true => $peer['allowed_ips'], default => '0.0.0.0/0, ::/0'},
+          'public_key'           => $value['public_key'],
+          'endpoint'             => $value['endpoint'],
+          'allowed_ips'          => ($value['allowed_ips'] != undef) ? { true => $value['allowed_ips'], default => '0.0.0.0/0, ::/0'},
+          'preshared_key'        => $value['preshared_key'],
+          'persistent_keepalive' => $value['persistent_keepalive'],
         }
       },
     }),
-    notify  => Exec["wireguard@${title}_reload"],
-  }
-
-  exec {"wireguard@${title}_reload":
-    command     => "/bin/systemctl reload wireguard@${title}.service",
-    refreshonly => true,
-    require     => Service["wireguard@${title}.service"],
+    notify  => Service["wireguard@${title}.service"],
   }
 
   service { "wireguard@${title}.service":
-    ensure  => running,
-    enable  => true,
+    ensure  => if $ensure { 'running' } else { 'stopped' },
+    enable  => if $ensure { true } else { false },
     require => File["/etc/wireguard/${title}.conf"],
   }
 }
