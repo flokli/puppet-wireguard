@@ -13,6 +13,7 @@
 define wireguard::tunnel (
   String  $private_key,
   Integer $listen_port,
+  Enum['present','absent'] $ensure = 'present',
   Hash[String, Struct[
     {
       public_key           => String,
@@ -31,7 +32,7 @@ define wireguard::tunnel (
   }
 
   file { "/etc/wireguard/${title}.conf":
-    ensure  => file,
+    ensure  => $ensure,
     content => epp('wireguard/config.epp', {
       private_key => $private_key,
       listen_port => $listen_port,
@@ -47,8 +48,8 @@ define wireguard::tunnel (
   }
 
   service { "wireguard@${title}.service":
-    ensure  => running,
-    enable  => true,
+    ensure  => if $ensure { 'running' } else { 'stopped' },
+    enable  => if $ensure { true } else { false },
     require => File["/etc/wireguard/${title}.conf"],
   }
 }
