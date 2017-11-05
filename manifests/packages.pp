@@ -1,5 +1,11 @@
-class wireguard::packages {
-  if($::osfamily == 'debian') {
+# Install wireguard packages for kernel module and tools
+class wireguard::packages (
+  # Wireguard tools only work with the kernel module with the same version; take
+  # care if using `latest` as it may break the tools until the module has been
+  # reloaded
+  Variant[Enum['installed', 'latest', 'present'], String] $ensure = 'installed',
+) {
+  if $facts['osfamily'] == 'debian' {
     include apt
 
     $osname = $facts['os']['name']
@@ -36,7 +42,7 @@ class wireguard::packages {
   }
 
   package { ['wireguard-dkms', 'wireguard-tools']:
-    ensure => latest,
+    ensure => $ensure,
   }
 
   file { '/etc/wireguard':
