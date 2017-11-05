@@ -2,11 +2,13 @@ class wireguard::packages {
   if($::osfamily == 'debian') {
     include apt
 
-    case $facts['os']['name'] {
+    $osname = $facts['os']['name']
+
+    case $osname {
       'ubuntu' : {
         apt::source { 'wireguard' :
-          location => "http://ppa.launchpad.net/wireguard/wireguard/${::osname}",
-          release  => $::lsbdistcodename,
+          location => "http://ppa.launchpad.net/wireguard/wireguard/${osname}",
+          release  => $facts['lsbdistcodename'],
           repos    => 'main',
           key      => {
             'id'     => 'E1B39B6EF6DDB96564797591AE33835F504A1A25',
