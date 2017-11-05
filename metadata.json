@@ -1,0 +1,47 @@
+{
+  "name": "flokli-wireguard",
+  "version": "0.1.0",
+  "author": "Florian Klink",
+  "summary": "Install and manage WireGuard tunnels",
+  "license": "FIXME",
+  "source": "https://github.com/flokli/puppet-wireguard.git",
+  "project_page": "https://github.com/flokli/puppet-wireguard",
+  "issues_url": "https://github.com/flokli/puppet-wireguard/issues",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.1.0"
+    },
+    {
+      "name": "puppetlabs/apt",
+      "version_requirement": ">= 4.0.0"
+    }
+  ],
+  "data_provider": null,
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [
+        "14.04",
+        "16.04",
+        "17.04"
+      ]
+    },
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "8.0",
+        "9.0"
+      ]
+    },
+    {
+      "operatingsystem": "Archlinux"
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 4.7.0"
+    }
+  ]
+}
