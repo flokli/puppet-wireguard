@@ -4,6 +4,9 @@ class wireguard::packages (
   # care if using `latest` as it may break the tools until the module has been
   # reloaded
   Variant[Enum['installed', 'latest', 'present'], String] $ensure = 'installed',
+  # Containers (e.g. LXC) can use wireguard but usually have no way of loading
+  # kernel modules and hence doesn't need the dkms packages
+  Boolean $tools_only = false,
 ) {
   if $facts['osfamily'] == 'debian' {
     include apt
@@ -41,7 +44,13 @@ class wireguard::packages (
     }
   }
 
-  package { ['wireguard-dkms', 'wireguard-tools']:
+  unless $tools_only {
+    package { 'wireguard-dkms':
+      ensure => $ensure,
+    }
+  }
+
+  package { 'wireguard-tools':
     ensure => $ensure,
   }
 
