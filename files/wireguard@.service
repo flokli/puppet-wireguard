@@ -3,6 +3,7 @@ Description=WireGuard via wg(8) for %I
 After=network-online.target
 Wants=network-online.target
 ConditionFileNotEmpty=/etc/wireguard/%i.conf
+ConditionPathExists=!/sys/class/net/%i
 Documentation=man:wg(8)
 Documentation=https://www.wireguard.io/
 Documentation=https://www.wireguard.io/quickstart/
@@ -11,9 +12,9 @@ Documentation=https://git.zx2c4.com/WireGuard/about/src/tools/wg.8
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStartPre=/sbin/ip link add dev %i type wireguard
+ExecStartPre=/usr/bin/env ip link add dev %i type wireguard
 ExecStart=/usr/bin/wg setconf %i /etc/wireguard/%i.conf
-ExecStop=/sbin/ip link del %i
+ExecStop=/usr/bin/env sh -c 'ip link show %i >/dev/null 2>/dev/null && ip link del dev %i'
 ExecReload=/usr/bin/wg setconf %i /etc/wireguard/%i.conf
 
 [Install]
