@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "author": "Florian Klink",
   "summary": "Install and manage WireGuard tunnels",
-  "license": "FIXME",
+  "license": "MIT",
   "source": "https://github.com/flokli/puppet-wireguard.git",
   "project_page": "https://github.com/flokli/puppet-wireguard",
   "issues_url": "https://github.com/flokli/puppet-wireguard/issues",
