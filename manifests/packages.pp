@@ -1,12 +1,23 @@
-class wireguard::packages {
-  if($::osfamily == 'debian') {
+# Install wireguard packages for kernel module and tools
+class wireguard::packages (
+  # Wireguard tools only work with the kernel module with the same version; take
+  # care if using `latest` as it may break the tools until the module has been
+  # reloaded
+  Variant[Enum['installed', 'latest', 'present'], String] $ensure = 'installed',
+  # Containers (e.g. LXC) can use wireguard but usually have no way of loading
+  # kernel modules and hence doesn't need the dkms packages
+  Boolean $tools_only = false,
+) {
+  if $facts['osfamily'] == 'debian' {
     include apt
 
-    case $facts['os']['name'] {
+    $osname = $facts['os']['name']
+
+    case $osname {
       'ubuntu' : {
         apt::source { 'wireguard' :
-          location => "http://ppa.launchpad.net/wireguard/wireguard/${::osname}",
-          release  => $::lsbdistcodename,
+          location => "http://ppa.launchpad.net/wireguard/wireguard/${osname}",
+          release  => $facts['lsbdistcodename'],
           repos    => 'main',
           key      => {
             'id'     => 'E1B39B6EF6DDB96564797591AE33835F504A1A25',
@@ -33,8 +44,14 @@ class wireguard::packages {
     }
   }
 
-  package { ['wireguard-dkms', 'wireguard-tools']:
-    ensure => latest,
+  unless $tools_only {
+    package { 'wireguard-dkms':
+      ensure => $ensure,
+    }
+  }
+
+  package { 'wireguard-tools':
+    ensure => $ensure,
   }
 
   file { '/etc/wireguard':
